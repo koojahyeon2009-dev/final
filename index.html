@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Firebase SDKs (Firestore 추가) -->
+  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -32,23 +32,15 @@
       const db = getFirestore(app);
       window.db = db;
       window.firestoreTools = { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp };
-      console.log("Firebase & Firestore 초기화 성공");
     } catch(e) {
       console.warn("Firebase 초기화 에러", e);
     }
   </script>
 
   <style>
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-    }
-    .glass-panel {
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-    }
-    .dark-tiles .leaflet-tile {
-      filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3);
-    }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48; }
+    .glass-panel { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .dark-tiles .leaflet-tile { filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3); }
     .signal-marker-badge {
       background: rgba(15, 23, 42, 0.95);
       border: 2px solid #334155;
@@ -94,7 +86,7 @@
 
     <!-- 2. Top UI Overlay -->
     <div class="relative z-20 px-4 pt-4 w-full flex flex-col gap-3 pointer-events-none items-center">
-      <div class="bg-surface-container/90 glass-panel rounded-xl border border-slate-700/50 p-3 flex flex-wrap sm:flex-nowrap items-center gap-2 w-full max-w-2xl pointer-events-auto shadow-2xl">
+      <div class="bg-surface-container/90 glass-panel rounded-xl border border-slate-700/50 p-3 flex flex-wrap sm:flex-nowrap items-center gap-2 w-full max-w-3xl pointer-events-auto shadow-2xl">
         <input type="text" id="startInput" value="서현역" placeholder="출발지" class="bg-slate-900/80 border border-slate-700 text-white text-sm rounded-lg p-2.5 flex-1 focus:ring-primary focus:border-primary">
         <input type="text" id="destInput" value="분당대진고등학교" placeholder="목적지" class="bg-slate-900/80 border border-slate-700 text-white text-sm rounded-lg p-2.5 flex-1 focus:ring-primary focus:border-primary">
         
@@ -105,6 +97,12 @@
         
         <button id="searchBtn" type="button" class="bg-primary-container text-slate-950 font-bold px-4 py-2.5 rounded-lg text-sm hover:brightness-110 active:scale-95 transition-all">
           경로 검색
+        </button>
+
+        <!-- 게시판 바로가기 버튼 -->
+        <button type="button" onclick="document.getElementById('reviewSection').scrollIntoView({ behavior: 'smooth' })" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2.5 rounded-lg text-sm flex items-center gap-1 transition-all">
+          <span class="material-symbols-outlined text-[18px]">rate_review</span>
+          <span>후기</span>
         </button>
       </div>
 
@@ -175,8 +173,8 @@
     </div>
   </div>
 
-  <!-- 5. 신규 추가: 사용자 후기 게시판 섹션 -->
-  <section class="relative z-20 bg-background/95 border-t border-slate-800 py-12 px-4">
+  <!-- 5. 사용자 후기 게시판 섹션 -->
+  <section id="reviewSection" class="relative z-20 bg-background/95 border-t border-slate-800 py-12 px-4">
     <div class="max-w-4xl mx-auto flex flex-col gap-8">
       
       <div class="flex flex-col gap-1">
@@ -216,7 +214,7 @@
   <!-- Script Logic -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. 지도 초기화
+      // 1. 지도 및 경로 초기화
       const map = L.map('map', { zoomControl: false }).setView([37.3827, 127.1189], 14);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
